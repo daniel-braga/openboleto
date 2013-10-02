@@ -1,0 +1,24 @@
+{
+    "name": "danielbraga/openboleto",
+    "description": "API para geração de boletos bancários",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "boleto",
+        "febraban",
+        "pdf"
+    ],
+    "minimum-stability": "dev",
+    "authors": [
+        {"name": "Daniel Braga", "email": "daniel@danielbraga.com"}
+    ],
+    "autoload": {
+        "psr-0": { "OpenBoleto\\": "lib/" }
+    },
+    "require": {
+        "php": ">=5.4",
+        "zendframework/zendpdf": "dev-master",
+        "zendframework/zend-barcode": "dev-master",
+        "zendframework/zend-servicemanager": "dev-master",
+        "zendframework/zend-validator": "dev-master"
+    }
+}
