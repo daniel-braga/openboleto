@@ -1,7 +1,7 @@
 <?php
 include '../vendor/autoload.php';
 
-use OpenBoleto\Boleto;
+use OpenBoleto\BoletoFactory;
 
 $dataVencimento = DateTime::createFromFormat('d/m/Y', '20/05/2011');
 
@@ -29,5 +29,5 @@ $layoutParams = array(
 	
 );
 
-$boleto = Boleto::factory('pdf', 'santander', $layoutParams);
+$boleto = BoletoFactory::createFactory('santander', $layoutParams);
 $boleto->output();

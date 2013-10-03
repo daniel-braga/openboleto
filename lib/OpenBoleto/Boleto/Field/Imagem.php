@@ -1,12 +1,12 @@
 <?php
 
-namespace OpenBoleto\Boleto\Field\Pdf;
+namespace OpenBoleto\Boleto\Field;
 
-use OpenBoleto\Boleto\Field\Pdf as PdfField;
-use OpenBoleto\Boleto\Pdf as BoletoPdf;
+use OpenBoleto\Boleto\Field;
+use OpenBoleto\Boleto\AbstractBoleto;
 use ZendPdf\Image;
 
-class Imagem extends PdfField
+class Imagem extends Field
 {
 	public function draw() 
 	{
@@ -20,9 +20,9 @@ class Imagem extends PdfField
 		$barcodeImageWidth = ($pdfImageResource->getPixelWidth()/96) * 72; // pixels to points at 96dpi
 		
 		$x2 = $x1+$barcodeImageWidth;
-		$y1 = BoletoPdf::translateYPosition($y2+$barcodeImageHeight);
-		$y2 = BoletoPdf::translateYPosition($y2);
+		$y1 = AbstractBoleto::translateYPosition($y2+$barcodeImageHeight);
+		$y2 = AbstractBoleto::translateYPosition($y2);
 
-		$this->_container->drawImage($pdfImageResource, $x1, $y1, $x2, $y2);
+		$this->_boleto->drawImage($pdfImageResource, $x1, $y1, $x2, $y2);
 	}
 }

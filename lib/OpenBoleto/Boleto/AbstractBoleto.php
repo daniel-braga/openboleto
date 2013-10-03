@@ -4,18 +4,18 @@ namespace OpenBoleto\Boleto;
 
 use OpenBoleto\Layout;
 use OpenBoleto\Boleto\Field;
-use OpenBoleto\Boleto\Field\Pdf as PdfField;
-use OpenBoleto\Boleto\Field\Pdf\Barcode as BarcodeField;
-use OpenBoleto\Boleto\Field\Pdf\LogoBanco as LogoBancoField;
-use OpenBoleto\Boleto\Field\Pdf\CodigoBanco as CodigoBancoField;
-use OpenBoleto\Boleto\Field\Pdf\LinhaDigitavel as LinhaDigitavelField;
+use OpenBoleto\Boleto\Field\Barcode as BarcodeField;
+use OpenBoleto\Boleto\Field\LogoBanco as LogoBancoField;
+use OpenBoleto\Boleto\Field\CodigoBanco as CodigoBancoField;
+use OpenBoleto\Boleto\Field\LinhaDigitavel as LinhaDigitavelField;
 
+use ZendPdf\PdfDocument;
 use ZendPdf\Page;
 use ZendPdf\Font;
 use ZendPdf\Color;
 use ZendPdf\Resource\Font\Simple\AbstractSimple as AbstractSimpleFont;
 
-abstract class Pdf extends Page 
+abstract class AbstractBoleto extends Page 
 {
 	/**
 	 * 
@@ -118,7 +118,7 @@ abstract class Pdf extends Page
 			throw new Exception(sprintf('Campo %s já existe', $fieldName));
 		}
 		
-		$field->setContainer($this);
+		$field->setBoleto($this);
 		$this->_fields[$fieldName] = $field;
 	}
 	
@@ -228,7 +228,7 @@ abstract class Pdf extends Page
 			'height' => 20,
 			'width' => 360
 		)));
-		$this->addField(new PdfField('reciboCedente', array(
+		$this->addField(new Field('reciboCedente', array(
 			'label' => 'Cedente',
 			'dataProperty' => 'cedente',
 			'x' => 40,
@@ -236,14 +236,14 @@ abstract class Pdf extends Page
 			'width' => 240,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('reciboCodigoCedente', array(
+		$this->addField(new Field('reciboCodigoCedente', array(
 			'label' => 'Agência/Código do cedente',
 			'x' => 280,
 			'y' => 140,
 			'width' => 110,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('reciboEspecieMoeda', array(
+		$this->addField(new Field('reciboEspecieMoeda', array(
 			'label' => 'Espécie',
 			'dataProperty' => 'especieMoeda',
 			'x' => 390,
@@ -251,7 +251,7 @@ abstract class Pdf extends Page
 			'width' => 30,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('reciboQuantidade', array(
+		$this->addField(new Field('reciboQuantidade', array(
 			'label' => 'Quantidade',
 			'dataProperty' => 'quantidade',
 			'x' => 420,
@@ -259,7 +259,7 @@ abstract class Pdf extends Page
 			'width' => 50,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('reciboNossoNumero', array(
+		$this->addField(new Field('reciboNossoNumero', array(
 			'label' => 'Nosso número',
 			'dataProperty' => 'nossoNumero',
 			'x' => 470,
@@ -268,7 +268,7 @@ abstract class Pdf extends Page
 			'height' => 20,
 			'align' => 'right'
 		)));
-		$this->addField(new PdfField('reciboNumeroDocumento', array(
+		$this->addField(new Field('reciboNumeroDocumento', array(
 			'label' => 'Número do documento',
 			'dataProperty' => 'numeroDocumento',
 			'x' => 40,
@@ -276,7 +276,7 @@ abstract class Pdf extends Page
 			'width' => 160,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('reciboCpfCnpj', array(
+		$this->addField(new Field('reciboCpfCnpj', array(
 			'label' => 'CPF/CNPJ',
 			'dataProperty' => 'cpfCnpjCedente',
 			'x' => 200,
@@ -284,7 +284,7 @@ abstract class Pdf extends Page
 			'width' => 110,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('reciboDataVencimento', array(
+		$this->addField(new Field('reciboDataVencimento', array(
 			'label' => 'Vencimento',
 			'dataProperty' => 'dataVencimento',
 			'x' => 310,
@@ -293,7 +293,7 @@ abstract class Pdf extends Page
 			'height' => 20,
 			'renderer' => $dateRenderer
 		)));
-		$this->addField(new PdfField('reciboValorDocumento', array(
+		$this->addField(new Field('reciboValorDocumento', array(
 			'label' => 'Valor documento',
 			'dataProperty' => 'valorDocumento',
 			'x' => 420,
@@ -303,35 +303,35 @@ abstract class Pdf extends Page
 			'align' => 'right',
 			'renderer' => $currencyRenderer
 		)));
-		$this->addField(new PdfField('reciboValorAbatimento', array(
+		$this->addField(new Field('reciboValorAbatimento', array(
 			'label' => '(-) Descontos/Abatimentos',
 			'x' => 40,
 			'y' => 180,
 			'width' => 95,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('reciboValorDeducao', array(
+		$this->addField(new Field('reciboValorDeducao', array(
 			'label' => '(-) Outras deduções',
 			'x' => 135,
 			'y' => 180,
 			'width' => 95,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('reciboValorMulta', array(
+		$this->addField(new Field('reciboValorMulta', array(
 			'label' => '(+) Mora/Multa',
 			'x' => 230,
 			'y' => 180,
 			'width' => 95,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('reciboValorAcrescimo', array(
+		$this->addField(new Field('reciboValorAcrescimo', array(
 			'label' => '(+) Outros acréscimos',
 			'x' => 325,
 			'y' => 180,
 			'width' => 95,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('reciboValorCobrado', array(
+		$this->addField(new Field('reciboValorCobrado', array(
 			'label' => '(=) Valor cobrado',
 			'x' => 420,
 			'y' => 180,
@@ -339,7 +339,7 @@ abstract class Pdf extends Page
 			'height' => 20,
 			'align' => 'right'
 		)));
-		$this->addField(new PdfField('reciboNomeSacado', array(
+		$this->addField(new Field('reciboNomeSacado', array(
 			'label' => 'Pagador',
 			'dataProperty' => 'nomeSacado',
 			'x' => 40,
@@ -347,7 +347,7 @@ abstract class Pdf extends Page
 			'width' => 530,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('reciboDemonstrativo', array(
+		$this->addField(new Field('reciboDemonstrativo', array(
 			'label' => 'Demonstrativo',
 			'dataProperty' => 'demonstrativo',
 			'multiline' => true,
@@ -377,7 +377,7 @@ abstract class Pdf extends Page
 			'height' => 20,
 			'width' => 360
 		)));
-		$this->addField(new PdfField('fichaLocalPagamento', array(
+		$this->addField(new Field('fichaLocalPagamento', array(
 			'label' => 'Local de pagamento',
 			'dataProperty' => 'localPagamento',
 			'x' => 40,
@@ -385,7 +385,7 @@ abstract class Pdf extends Page
 			'width' => 380,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('fichaDataVencimento', array(
+		$this->addField(new Field('fichaDataVencimento', array(
 			'label' => 'Vencimento',
 			'dataProperty' => 'dataVencimento',
 			'x' => 420,
@@ -395,7 +395,7 @@ abstract class Pdf extends Page
 			'align' => 'right',
 			'renderer' => $dateRenderer
 		)));
-		$this->addField(new PdfField('fichaCedente', array(
+		$this->addField(new Field('fichaCedente', array(
 			'label' => 'Cedente',
 			'dataProperty' => 'cedente',
 			'x' => 40,
@@ -403,7 +403,7 @@ abstract class Pdf extends Page
 			'width' => 380,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('fichaCodigoCedente', array(
+		$this->addField(new Field('fichaCodigoCedente', array(
 			'label' => 'Agência/Código do cedente',
 			'x' => 420,
 			'y' => 360,
@@ -411,7 +411,7 @@ abstract class Pdf extends Page
 			'height' => 20,
 			'align' => 'right'
 		)));
-		$this->addField(new PdfField('fichaDataDocumento', array(
+		$this->addField(new Field('fichaDataDocumento', array(
 			'label' => 'Data do documento',
 			'dataProperty' => 'dataDocumento',
 			'x' => 40,
@@ -420,7 +420,7 @@ abstract class Pdf extends Page
 			'height' => 20,
 			'renderer' => $dateRenderer
 		)));
-		$this->addField(new PdfField('fichaNumeroDocumento', array(
+		$this->addField(new Field('fichaNumeroDocumento', array(
 			'label' => 'Nº do documento',
 			'dataProperty' => 'numeroDocumento',
 			'x' => 130,
@@ -428,7 +428,7 @@ abstract class Pdf extends Page
 			'width' => 90,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('fichaEspecieDocumento', array(
+		$this->addField(new Field('fichaEspecieDocumento', array(
 			'label' => 'Espécie doc.',
 			'dataProperty' => 'especieDocumento',
 			'x' => 220,
@@ -436,7 +436,7 @@ abstract class Pdf extends Page
 			'width' => 55,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('fichaAceite', array(
+		$this->addField(new Field('fichaAceite', array(
 			'label' => 'Aceite',
 			'dataProperty' => 'aceite',
 			'x' => 275,
@@ -444,7 +444,7 @@ abstract class Pdf extends Page
 			'width' => 55,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('fichaDataProcessamento', array(
+		$this->addField(new Field('fichaDataProcessamento', array(
 			'label' => 'Data processamento',
 			'dataProperty' => 'dataProcessamento',
 			'x' => 330,
@@ -453,7 +453,7 @@ abstract class Pdf extends Page
 			'height' => 20,
 			'renderer' => $dateRenderer
 		)));
-		$this->addField(new PdfField('fichaNossoNumero', array(
+		$this->addField(new Field('fichaNossoNumero', array(
 			'label' => 'Nosso número',
 			'dataProperty' => 'nossoNumero',
 			'x' => 420,
@@ -463,7 +463,7 @@ abstract class Pdf extends Page
 			'align' => 'right'
 		)));
 		
-		$this->addField(new PdfField('fichaCarteira', array(
+		$this->addField(new Field('fichaCarteira', array(
 			'label' => 'Carteira',
 			'dataProperty' => 'carteira',
 			'x' => 40,
@@ -471,7 +471,7 @@ abstract class Pdf extends Page
 			'width' => 180,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('fichaEspecieMoeda', array(
+		$this->addField(new Field('fichaEspecieMoeda', array(
 			'label' => 'Espécie Moeda',
 			'dataProperty' => 'especieMoeda',
 			'x' => 220,
@@ -479,7 +479,7 @@ abstract class Pdf extends Page
 			'width' => 55,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('fichaQuantidade', array(
+		$this->addField(new Field('fichaQuantidade', array(
 			'label' => 'Quantidade',
 			'dataProperty' => 'quantidade',
 			'x' => 275,
@@ -487,14 +487,14 @@ abstract class Pdf extends Page
 			'width' => 55,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('fichaValorDocumento2', array(
+		$this->addField(new Field('fichaValorDocumento2', array(
 			'label' => '(x) Valor',
 			'x' => 330,
 			'y' => 400,
 			'width' => 90,
 			'height' => 20
 		)));
-		$this->addField(new PdfField('fichaValorDocumento', array(
+		$this->addField(new Field('fichaValorDocumento', array(
 			'label' => '(=) Valor documento',
 			'dataProperty' => 'valorDocumento',
 			'x' => 420,
@@ -505,7 +505,7 @@ abstract class Pdf extends Page
 			'renderer' => $currencyRenderer
 		)));
 		
-		$this->addField(new PdfField('fichaInstrucao', array(
+		$this->addField(new Field('fichaInstrucao', array(
 			'label' => 'Instruções (Texto de responsabilidade do cedente)',
 			'dataProperty' => 'instrucao',
 			'multiline' => true,
@@ -515,7 +515,7 @@ abstract class Pdf extends Page
 			'height' => 100
 		)));
 		
-		$this->addField(new PdfField('fichaValorAbatimento', array(
+		$this->addField(new Field('fichaValorAbatimento', array(
 			'label' => '(-) Descontos/Abatimentos',
 			'x' => 420,
 			'y' => 420,
@@ -523,7 +523,7 @@ abstract class Pdf extends Page
 			'height' => 20,
 			'align' => 'right'
 		)));
-		$this->addField(new PdfField('fichaValorDeducao', array(
+		$this->addField(new Field('fichaValorDeducao', array(
 			'label' => '(-) Outras deduções',
 			'x' => 420,
 			'y' => 440,
@@ -531,7 +531,7 @@ abstract class Pdf extends Page
 			'height' => 20,
 			'align' => 'right'
 		)));
-		$this->addField(new PdfField('fichaValorMulta', array(
+		$this->addField(new Field('fichaValorMulta', array(
 			'label' => '(+) Mora/Multa',
 			'x' => 420,
 			'y' => 460,
@@ -539,7 +539,7 @@ abstract class Pdf extends Page
 			'height' => 20,
 			'align' => 'right'
 		)));
-		$this->addField(new PdfField('fichaAcrescimos', array(
+		$this->addField(new Field('fichaAcrescimos', array(
 			'label' => '(+) Outros acréscimos',
 			'x' => 420,
 			'y' => 480,
@@ -547,7 +547,7 @@ abstract class Pdf extends Page
 			'height' => 20,
 			'align' => 'right'
 		)));
-		$this->addField(new PdfField('fichaValorCobrado', array(
+		$this->addField(new Field('fichaValorCobrado', array(
 			'label' => '(=) Valor cobrado',
 			'x' => 420,
 			'y' => 500,
@@ -556,7 +556,7 @@ abstract class Pdf extends Page
 			'align' => 'right'
 		)));
 		
-		$this->addField(new PdfField('fichaSacado', array(
+		$this->addField(new Field('fichaSacado', array(
 			'label' => 'Sacado',
 			'dataProperty' => 'nomeSacado',
 			'multiline' => true,
@@ -565,7 +565,7 @@ abstract class Pdf extends Page
 			'width' => 530,
 			'height' => 60
 		)));
-		$this->addField(new PdfField('fichaSacadorAvalista', array(
+		$this->addField(new Field('fichaSacadorAvalista', array(
 			'label' => 'Sacador/Avalista',
 			'dataProperty' => 'sacadorAvalista',
 			'multiline' => true,
@@ -608,4 +608,15 @@ abstract class Pdf extends Page
 			$y += 20;
 		}
 	}
+    
+    public function output(array $options = array())
+    {
+        $this->init();
+		$this->draw();
+        
+        $pdf = new PdfDocument();
+		$pdf->pages[] = $this;
+        
+        $pdf->save('/Users/daniel/output.pdf');
+    }
 }

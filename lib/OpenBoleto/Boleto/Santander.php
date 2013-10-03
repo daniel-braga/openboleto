@@ -1,12 +1,12 @@
 <?php
 
-namespace OpenBoleto\Boleto\Santander;
+namespace OpenBoleto\Boleto;
 
-use OpenBoleto\Boleto;
-use OpenBoleto\Boleto\Pdf as BasePdf;
+use OpenBoleto\BoletoFactory;
+use OpenBoleto\Boleto\AbstractBoleto;
 use OpenBoleto\Layout\Santander as LayoutSantander;
 
-class Pdf extends BasePdf {
+class Santander extends AbstractBoleto {
 	
 	public function __construct(LayoutSantander $layout) {
 		parent::__construct();
@@ -21,7 +21,7 @@ class Pdf extends BasePdf {
 			return sprintf('%s / %s', $layout->get('pontoVenda'), $layout->get('codigoCedente'));
 		};
 
-		$logoFile = Boleto::getRootDir() . '/Layout/Santander/logo.jpg';
+		$logoFile = BoletoFactory::getRootDir() . '/Layout/Santander/logo.jpg';
 		$this->getField('reciboLogoBanco')
 			->setValue($logoFile);
 		$this->getField('fichaLogoBanco')

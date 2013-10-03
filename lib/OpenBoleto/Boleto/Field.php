@@ -2,17 +2,20 @@
 
 namespace OpenBoleto\Boleto;
 
-use OpenBoleto\Boleto\Pdf;
+use OpenBoleto\Boleto\AbstractBoleto;
+use ZendPdf\Font;
+use ZendPdf\Color;
+use ZendPdf\Page;
 
-abstract class Field 
+class Field 
 {
 	/**
 	 * 
 	 * Enter description here ...
 	 * 
-	 * @var OpenBoleto_Boleto_Pdf
+	 * @var AbstractBoleto
 	 */
-	protected $_container;
+	protected $_boleto;
 	
 	/**
 	 * 
@@ -103,6 +106,14 @@ abstract class Field
 	
 	/**
 	 * 
+	 * Indica se o campo possui bordas
+	 * 
+	 * @var boolean
+	 */
+	protected $_border = true;
+	
+	/**
+	 * 
 	 * Construtor
 	 * 
 	 * @param string $name
@@ -139,12 +150,12 @@ abstract class Field
 	
 	public function getDataPropertyValue() 
 	{
-		return $this->_dataProperty ? $this->_container->getLayout()->get($this->_dataProperty) : null;
+		return $this->_dataProperty ? $this->_boleto->getLayout()->get($this->_dataProperty) : null;
 	}
 	
-	public function setContainer(Pdf $container) 
+	public function setBoleto(AbstractBoleto $boleto) 
 	{
-		$this->_container = $container;
+		$this->_boleto = $boleto;
 		
 		return $this;
 	}
@@ -240,6 +251,71 @@ abstract class Field
 	{
 		return $this->_value;
 	}
+    
+    public function setBorder($border)
+	{
+		$this->_border = $border;
+	}
 	
-	abstract public function draw();
+	public function draw() 
+	{
+		$x1 = $this->_x;
+		$y1 = $this->_y;
+		$x2 = $this->_x + $this->_width;
+		$y2 = $this->_y + $this->_height;
+		
+		$value = $this->_dataProperty ? $this->getDataPropertyValue() : $this->getValue();
+		if (!is_null($this->_renderer) && is_callable($this->_renderer)) {
+			$value = call_user_func($this->_renderer, $value, $this->_boleto->getLayout());
+		}
+		
+		$fontBold = Font::fontWithName(Font::FONT_HELVETICA_BOLD);
+		$fontNormal = Font::fontWithName(Font::FONT_HELVETICA);
+		
+		if ($this->_border) {
+			$this->_boleto->setLineDashingPattern(Page::LINE_DASHING_SOLID);
+			$this->_boleto->setLineWidth(0.75);
+			$this->_boleto->setLineColor(new Color\GrayScale(0));
+			$this->_boleto->drawRectangle(
+				$x1, 
+				AbstractBoleto::translateYPosition($y1), 
+				$x2, 
+				AbstractBoleto::translateYPosition($y2), 
+				Page::SHAPE_DRAW_STROKE
+			);
+		}
+		$this->_boleto->setFont($fontNormal, 7);
+		$this->_boleto->drawText($this->_label, ($x1+2), AbstractBoleto::translateYPosition($y1+8), 'UTF-8');
+		$this->_boleto->setFont($fontBold, 9);
+		
+		if ($this->_multiline) {
+			$y1 = $y1+18;
+		}
+		else {
+			$y1 = $y1+$this->_height-2;
+		}
+		
+		if ($this->_align == 'left') {
+			$x1 += 2;
+		}
+		elseif (false === $this->_multiline) {
+			$x1 = $x2 - 2 - AbstractBoleto::getTextWidth($value, $fontBold, 9);
+		}
+		
+		if ($value && $this->_multiline) {
+			$value = explode("\n", $value);
+			
+			foreach($value as $v) {
+				if ($this->_align == 'right') {
+					$x1 = $x2 - 2 - AbstractBoleto::getTextWidth($v, $fontBold, 9);
+				}
+				
+				$this->_boleto->drawText($v, $x1, AbstractBoleto::translateYPosition($y1), 'UTF-8');
+				$y1 += 10;	
+			}
+		}
+		else {
+			$this->_boleto->drawText($value, $x1, AbstractBoleto::translateYPosition($y1), 'UTF-8');
+		}
+	}
 }
