@@ -80,14 +80,20 @@ abstract class Layout {
 	 * Enter description here ...
 	 * @var string
 	 */
-	protected $nomeSacado = '';
+	protected $nomePagador = '';
+    
+    /**
+     *
+     * @var string 
+     */
+    protected $cpfCnpjPagador = '';
 	
 	/**
 	 * 
 	 * Enter description here ...
 	 * @var string
 	 */
-	protected $enderecoSacado = '';
+	protected $enderecoPagador = '';
 	
 	/**
 	 * 
@@ -108,14 +114,14 @@ abstract class Layout {
 	 * Enter description here ...
 	 * @var float
 	 */	
-	protected $quantidade = 0;
+	protected $quantidade = '';
 	
 	/**
 	 * 
 	 * Enter description here ...
 	 * @var float
 	 */
-	protected $valorUnitario = 0;
+	protected $valorUnitario = '';
 
 	/**
 	 * 
@@ -129,14 +135,14 @@ abstract class Layout {
 	 * Enter description here ...
 	 * @var string
 	 */
-	protected $especieMoeda = 'REAL';
+	protected $especieMoeda = 'R$';
 	
 	/**
 	 * 
 	 * Enter description here ...
 	 * @var string
 	 */
-	protected $especieDocumento = '';
+	protected $especieDocumento = 'DM';
 	
 	/**
 	 * 
@@ -157,49 +163,62 @@ abstract class Layout {
 	 * Enter description here ...
 	 * @var unknown_type
 	 */
-	protected $codigoCedente = '';
+	protected $codigoBeneficiario = '';
 	
 	/**
 	 * 
 	 * Enter description here ...
 	 * @var string
 	 */
-	protected $cpfCnpjCedente = '';
+	protected $cpfCnpjBeneficiario = '';
 	
 	/**
 	 * 
 	 * Enter description here ...
 	 * @var string
 	 */
-	protected $enderecoCedente = '';
+	protected $enderecoBeneficiario = '';
 	
 	/**
 	 * 
 	 * Enter description here ...
 	 * @var string
 	 */
-	protected $cidadeCedente = '';
+	protected $cidadeBeneficiario = '';
 	
 	/**
 	 * 
 	 * Enter description here ...
 	 * @var string
 	 */
-	protected $estadoCedente = '';
+	protected $estadoBeneficiario = '';
 	
 	/**
 	 * 
-	 * Nome do cedente
+	 * Nome do Beneficiário
 	 * @var string
 	 */
-	protected $cedente = '';
+	protected $beneficiario = '';
 	
 	/**
 	 * 
-	 * Sacador/Avalista
+	 * Sacador Avalista
 	 * @var string
 	 */
-	protected $sacadorAvalista = '';
+	protected $nomeSacadorAvalista = '';
+    
+    /**
+	 * 
+	 * CNPJ Sacador Avalista
+	 * @var string
+	 */
+	protected $cnpjSacadorAvalista = '';
+    
+    /**
+     *
+     * @var boolean
+     */
+    protected $gerarReciboEntrega = false;
 	
 	/**
 	 * 
@@ -207,7 +226,10 @@ abstract class Layout {
 	 * 
 	 * @param array $params
 	 */
-	public function __construct(array $params = array()) {
+	public function __construct(array $params = array(), $gerarReciboEntrega = false) {
+        
+        $this->gerarReciboEntrega = $gerarReciboEntrega;
+        
 		foreach ($params as $paramName => $paramValue) {
 			if (property_exists($this, $paramName))	{
 				$this->$paramName = $paramValue;
@@ -228,7 +250,7 @@ abstract class Layout {
 			return $this->$property;
 		}
 		
-		throw new Exception(sprintf('Propriedade %s não definida em %s', $property, __CLASS__));
+		throw new \Exception(sprintf('Propriedade %s não definida em %s', $property, __CLASS__));
 	}
 	
 	/**

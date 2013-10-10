@@ -10,7 +10,7 @@ class Imagem extends Field
 {
 	public function draw() 
 	{
-		$x1 = $this->_x+1;
+		$x1 = $this->_x;
 		$y2 = $this->_y;
 		
 		$value = $this->_dataProperty ? $this->getDataPropertyValue() : $this->getValue();

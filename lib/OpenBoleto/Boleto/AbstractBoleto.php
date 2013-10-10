@@ -6,6 +6,7 @@ use OpenBoleto\Layout;
 use OpenBoleto\Boleto\Field;
 use OpenBoleto\Boleto\Field\Barcode as BarcodeField;
 use OpenBoleto\Boleto\Field\LogoBanco as LogoBancoField;
+use OpenBoleto\Boleto\Field\NomeBanco as NomeBancoField;
 use OpenBoleto\Boleto\Field\CodigoBanco as CodigoBancoField;
 use OpenBoleto\Boleto\Field\LinhaDigitavel as LinhaDigitavelField;
 
@@ -115,7 +116,7 @@ abstract class AbstractBoleto extends Page
 	{
 		$fieldName = $field->getName();
 		if (array_key_exists($fieldName, $this->_fields)) {
-			throw new Exception(sprintf('Campo %s já existe', $fieldName));
+			throw new \Exception(sprintf('Campo %s já existe', $fieldName));
 		}
 		
 		$field->setBoleto($this);
@@ -144,7 +145,7 @@ abstract class AbstractBoleto extends Page
 	 * 
 	 * @param string $fieldName
 	 * @throws Exception
-	 * @return OpenBoleto_Boleto_Field
+	 * @return \OpenBoleto\Boleto\Field
 	 */
 	public function getField($fieldName) 
 	{
@@ -152,7 +153,7 @@ abstract class AbstractBoleto extends Page
 			return $this->_fields[$fieldName];
 		}	
 		
-		throw new Exception(sprintf('Campo %s inexistente', $fieldName));
+		throw new \Exception(sprintf('Campo %s inexistente', $fieldName));
 	}
 
 	/**
@@ -168,30 +169,31 @@ abstract class AbstractBoleto extends Page
 
 		// linha do Recibo do sacado
 		$this->setFont($fontBold, 8)
-			->setLineWidth(0.75)
-			->setLineColor(new Color\GrayScale(0))
-			->setLineDashingPattern(Page::LINE_DASHING_SOLID)
-			->drawLine(40, self::translateYPosition(20), 570, self::translateYPosition(20))
-			->drawText('RECIBO DO PAGADOR', 485, self::translateYPosition(30));
-			
-		// linha de corte do recibo
-		$this->setFont($fontNormal, 7)
-			->drawText('Corte na linha pontilhada', 490, self::translateYPosition(290))
-			->setLineDashingPattern(array(3, 2), 0)
-			->drawLine(40, self::translateYPosition(292), 570, self::translateYPosition(292));
-
-		// linha de corte da ficha de compensação
-		$this->setFont($fontNormal, 7)
-			->drawText('Corte na linha pontilhada', 490, self::translateYPosition(630))
-			->setLineDashingPattern(array(3, 2), 0)
-			->drawLine(40, self::translateYPosition(634), 570, self::translateYPosition(634));
+			->drawText('Recibo do Pagador', 490, self::translateYPosition(
+                $this->getField('reciboLinhaDigitavel')->getY()-5
+            ));
+		
+        // linha de corte do recibo
+        $posCut1 = self::translateYPosition(
+            $this->getField('reciboLinhaDigitavel')->getY()-15
+        );
+        $this->setLineDashingPattern(array(3, 2), 0)
+			->drawLine(30, $posCut1, 570, $posCut1);
+		
+        // linha de corte da ficha
+        $posCut2 = self::translateYPosition(
+            $this->getField('fichaLinhaDigitavel')->getY()-15
+        );
+		$this->setLineDashingPattern(array(3, 2), 0)
+			->drawLine(30, $posCut2, 570, $posCut2);
 			
 		$this->setFont($fontBold, 8)
 			->drawText('Ficha de Compensação', 480, self::translateYPosition($this->getField('fichaCodigoBarra')->getY()+5))
 			->setFont($fontNormal, 7)
-			->drawText('Autenticação Mecânica', 380, self::translateYPosition($this->getField('fichaCodigoBarra')->getY()+5))
-			->drawText('Autenticação Mecânica', 490, self::translateYPosition($this->getField('reciboDemonstrativo')->getY()+8));
-			
+			->drawText('Autenticação Mecânica', 380, self::translateYPosition(
+                $this->getField('fichaCodigoBarra')->getY()+5)
+            );
+        
 		foreach($this->_fields as $field) {
 			$field->draw();
 		}
@@ -206,380 +208,696 @@ abstract class AbstractBoleto extends Page
 			return $date;
 		};
 		$currencyRenderer = function($value, $layout) {
-			return number_format($value, 2, ',', '');
+			return number_format($value, 2, ',', '.');
 		};
+        
+        if ($this->getLayout()->get('gerarReciboEntrega')) {
+            $this->initReciboEntrega();
+        }
 		
 		// Recibo
 		$this->addField(new LogoBancoField('reciboLogoBanco', array(
-			'x' => 40,
-			'y' => 120,
-			'height' => 20,
-			'width' => 120
+			'x' => 30,
+			'y' => 359,
+			'height' => 30,
+			'width' => 30
+		)));
+        $this->addField(new NomeBancoField('reciboNomeBanco', array(
+			'x' => 60,
+			'y' => 369,
+			'height' => 30,
+			'width' => 80
 		)));
 		$this->addField(new CodigoBancoField('reciboCodigoBanco', array(
-			'x' => 160,
-			'y' => 120,
+			'x' => 150,
+			'y' => 369,
 			'height' => 20,
 			'width' => 50
 		)));
 		$this->addField(new LinhaDigitavelField('reciboLinhaDigitavel', array(
-			'x' => 210,
-			'y' => 120,
+			'x' => 200,
+			'y' => 369,
 			'height' => 20,
-			'width' => 360
+			'width' => 370
 		)));
-		$this->addField(new Field('reciboCedente', array(
-			'label' => 'Cedente',
-			'dataProperty' => 'cedente',
-			'x' => 40,
-			'y' => 140,
-			'width' => 240,
-			'height' => 20
-		)));
-		$this->addField(new Field('reciboCodigoCedente', array(
-			'label' => 'Agência/Código do cedente',
-			'x' => 280,
-			'y' => 140,
-			'width' => 110,
-			'height' => 20
-		)));
-		$this->addField(new Field('reciboEspecieMoeda', array(
-			'label' => 'Espécie',
-			'dataProperty' => 'especieMoeda',
-			'x' => 390,
-			'y' => 140,
-			'width' => 30,
-			'height' => 20
-		)));
-		$this->addField(new Field('reciboQuantidade', array(
-			'label' => 'Quantidade',
-			'dataProperty' => 'quantidade',
-			'x' => 420,
-			'y' => 140,
-			'width' => 50,
-			'height' => 20
-		)));
-		$this->addField(new Field('reciboNossoNumero', array(
-			'label' => 'Nosso número',
-			'dataProperty' => 'nossoNumero',
-			'x' => 470,
-			'y' => 140,
-			'width' => 100,
+		$this->addField(new Field('reciboBeneficiario', array(
+			'label' => 'Beneficiário',
+			'dataProperty' => 'beneficiario',
+			'x' => 30,
+			'y' => 394,
+			'width' => 200,
 			'height' => 20,
-			'align' => 'right'
-		)));
-		$this->addField(new Field('reciboNumeroDocumento', array(
-			'label' => 'Número do documento',
-			'dataProperty' => 'numeroDocumento',
-			'x' => 40,
-			'y' => 160,
-			'width' => 160,
-			'height' => 20
+            'border' => Field::BORDER_LEFT | Field::BORDER_TOP | Field::BORDER_BOTTOM
 		)));
 		$this->addField(new Field('reciboCpfCnpj', array(
-			'label' => 'CPF/CNPJ',
-			'dataProperty' => 'cpfCnpjCedente',
-			'x' => 200,
-			'y' => 160,
-			'width' => 110,
+			'label' => 'CNPJ/CPF',
+			'dataProperty' => 'cpfCnpjBeneficiario',
+			'x' => 230,
+			'y' => 394,
+			'width' => 90,
+			'height' => 20,
+            'border' => Field::BORDER_RIGHT | Field::BORDER_TOP | Field::BORDER_BOTTOM
+		)));
+        $this->addField(new Field('reciboNomeSacadorAvalista', array(
+			'label' => 'Sacador Avalista',
+			'dataProperty' => 'nomeSacadorAvalista',
+			'x' => 320,
+			'y' => 394,
+			'width' => 150,
 			'height' => 20
 		)));
 		$this->addField(new Field('reciboDataVencimento', array(
 			'label' => 'Vencimento',
 			'dataProperty' => 'dataVencimento',
-			'x' => 310,
-			'y' => 160,
+			'x' => 470,
+			'y' => 394,
+			'width' => 100,
+			'height' => 20,
+			'renderer' => $dateRenderer,
+            'align' => 'center'
+		)));
+        
+        $this->addField(new Field('reciboEnderecoBeneficiario', array(
+			'label' => 'Endereço Beneficiário/Sacador Avalista',
+			'dataProperty' => 'enderecoBeneficiario',
+			'x' => 30,
+			'y' => 414,
+			'width' => 540,
+			'height' => 20
+		)));
+        
+		$this->addField(new Field('reciboNossoNumero', array(
+			'label' => 'Nosso Número',
+			'dataProperty' => 'nossoNumero',
+			'x' => 30,
+			'y' => 434,
+			'width' => 90,
+			'height' => 20
+		)));
+        $this->addField(new Field('reciboCarteira', array(
+			'label' => 'Carteira',
+			'dataProperty' => 'carteira',
+			'x' => 120,
+			'y' => 434,
+			'width' => 90,
+			'height' => 20
+		)));
+        $this->addField(new Field('reciboEspecieDocumento', array(
+			'label' => 'Espécie Documento',
+			'dataProperty' => 'especieDocumento',
+			'x' => 210,
+			'y' => 434,
+			'width' => 80,
+			'height' => 20
+		)));
+		$this->addField(new Field('reciboQuantidade', array(
+			'label' => 'Quantidade',
+			'dataProperty' => 'quantidade',
+			'x' => 290,
+			'y' => 434,
+			'width' => 85,
+			'height' => 20
+		)));
+		$this->addField(new Field('reciboValorUnitario', array(
+			'label' => 'Valor',
+			'dataProperty' => 'valorUnitario',
+			'x' => 375,
+			'y' => 434,
+			'width' => 85,
+			'height' => 20
+		)));
+        $this->addField(new Field('reciboCodigoBeneficiario', array(
+			'label' => 'Agência/Código do Beneficiário',
+			'x' => 460,
+			'y' => 434,
 			'width' => 110,
+			'height' => 20,
+            'align' => 'right'
+		)));
+        
+        $this->addField(new Field('reciboDataDocumento', array(
+			'label' => 'Data do Documento',
+			'dataProperty' => 'dataDocumento',
+			'x' => 30,
+			'y' => 454,
+			'width' => 90,
+			'height' => 20,
+			'renderer' => $dateRenderer
+		)));
+		$this->addField(new Field('reciboNumeroDocumento', array(
+			'label' => 'Número do Documento',
+			'dataProperty' => 'numeroDocumento',
+			'x' => 120,
+			'y' => 454,
+			'width' => 90,
+			'height' => 20
+		)));
+        $this->addField(new Field('reciboEspecieMoeda', array(
+			'label' => 'Espécie',
+			'dataProperty' => 'especieMoeda',
+			'x' => 210,
+			'y' => 454,
+			'width' => 90,
+			'height' => 20
+		)));
+        $this->addField(new Field('reciboAceite', array(
+			'label' => 'Aceite',
+			'dataProperty' => 'aceite',
+			'x' => 300,
+			'y' => 454,
+			'width' => 50,
+			'height' => 20
+		)));
+        $this->addField(new Field('reciboDataProcessamento', array(
+			'label' => 'Data de Processamento',
+			'dataProperty' => 'dataProcessamento',
+			'x' => 350,
+			'y' => 454,
+			'width' => 90,
 			'height' => 20,
 			'renderer' => $dateRenderer
 		)));
 		$this->addField(new Field('reciboValorDocumento', array(
-			'label' => 'Valor documento',
+			'label' => 'Valor do Documento',
 			'dataProperty' => 'valorDocumento',
-			'x' => 420,
-			'y' => 160,
-			'width' => 150,
+			'x' => 440,
+			'y' => 454,
+			'width' => 130,
 			'height' => 20,
 			'align' => 'right',
 			'renderer' => $currencyRenderer
 		)));
-		$this->addField(new Field('reciboValorAbatimento', array(
-			'label' => '(-) Descontos/Abatimentos',
-			'x' => 40,
-			'y' => 180,
-			'width' => 95,
-			'height' => 20
-		)));
-		$this->addField(new Field('reciboValorDeducao', array(
-			'label' => '(-) Outras deduções',
-			'x' => 135,
-			'y' => 180,
-			'width' => 95,
-			'height' => 20
-		)));
-		$this->addField(new Field('reciboValorMulta', array(
-			'label' => '(+) Mora/Multa',
-			'x' => 230,
-			'y' => 180,
-			'width' => 95,
-			'height' => 20
-		)));
-		$this->addField(new Field('reciboValorAcrescimo', array(
-			'label' => '(+) Outros acréscimos',
-			'x' => 325,
-			'y' => 180,
-			'width' => 95,
-			'height' => 20
-		)));
-		$this->addField(new Field('reciboValorCobrado', array(
-			'label' => '(=) Valor cobrado',
-			'x' => 420,
-			'y' => 180,
-			'width' => 150,
-			'height' => 20,
-			'align' => 'right'
-		)));
-		$this->addField(new Field('reciboNomeSacado', array(
-			'label' => 'Pagador',
-			'dataProperty' => 'nomeSacado',
-			'x' => 40,
-			'y' => 200,
-			'width' => 530,
-			'height' => 20
-		)));
-		$this->addField(new Field('reciboDemonstrativo', array(
-			'label' => 'Demonstrativo',
-			'dataProperty' => 'demonstrativo',
-			'multiline' => true,
-			'x' => 40,
-			'y' => 220,
-			'width' => 530,
-			'height' => 60,
-			'border' => false
+        $this->addField(new Field('reciboAutenticacaoMecanica', array(
+			'label' => 'Autenticação Mecânica',
+			'x' => 370,
+			'y' => 479,
+			'width' => 200,
+			'height' => 17,
+            'border' => Field::BORDER_LEFT | Field::BORDER_TOP | Field::BORDER_RIGHT
 		)));
 		
 		// ficha de compensação
-		$this->addField(new LogoBancoField('fichaLogoBanco', array(
-			'x' => 40,
-			'y' => 320,
-			'height' => 20,
-			'width' => 120
+        $this->addField(new LogoBancoField('fichaLogoBanco', array(
+			'x' => 30,
+			'y' => 519,
+			'height' => 30,
+			'width' => 30
+		)));
+        $this->addField(new NomeBancoField('fichaNomeBanco', array(
+			'x' => 60,
+			'y' => 529,
+			'height' => 30,
+			'width' => 80
 		)));
 		$this->addField(new CodigoBancoField('fichaCodigoBanco', array(
-			'x' => 160,
-			'y' => 320,
+			'x' => 150,
+			'y' => 529,
 			'height' => 20,
 			'width' => 50
 		)));
 		$this->addField(new LinhaDigitavelField('fichaLinhaDigitavel', array(
-			'x' => 210,
-			'y' => 320,
+			'x' => 200,
+			'y' => 529,
 			'height' => 20,
-			'width' => 360
+			'width' => 370
 		)));
+        
 		$this->addField(new Field('fichaLocalPagamento', array(
-			'label' => 'Local de pagamento',
+			'label' => 'Local de Pagamento',
 			'dataProperty' => 'localPagamento',
-			'x' => 40,
-			'y' => 340,
-			'width' => 380,
-			'height' => 20
+			'x' => 30,
+			'y' => 554,
+			'width' => 400,
+			'height' => 30
 		)));
 		$this->addField(new Field('fichaDataVencimento', array(
 			'label' => 'Vencimento',
 			'dataProperty' => 'dataVencimento',
-			'x' => 420,
-			'y' => 340,
-			'width' => 150,
-			'height' => 20,
-			'align' => 'right',
+			'x' => 430,
+			'y' => 554,
+			'width' => 140,
+			'height' => 30,
+			'align' => 'center',
 			'renderer' => $dateRenderer
 		)));
-		$this->addField(new Field('fichaCedente', array(
-			'label' => 'Cedente',
-			'dataProperty' => 'cedente',
-			'x' => 40,
-			'y' => 360,
-			'width' => 380,
-			'height' => 20
+        
+		$this->addField(new Field('fichaBeneficiario', array(
+			'label' => 'Beneficiário',
+			'dataProperty' => 'beneficiario',
+			'x' => 30,
+			'y' => 584,
+			'width' => 270,
+			'height' => 20,
+            'border' => Field::BORDER_LEFT | Field::BORDER_TOP | Field::BORDER_BOTTOM
 		)));
-		$this->addField(new Field('fichaCodigoCedente', array(
-			'label' => 'Agência/Código do cedente',
-			'x' => 420,
-			'y' => 360,
-			'width' => 150,
+        $this->addField(new Field('fichaCpfCnpjBeneficiario', array(
+			'label' => 'CNPJ/CPF',
+			'dataProperty' => 'cpfCnpjBeneficiario',
+			'x' => 300,
+			'y' => 584,
+			'width' => 130,
+			'height' => 20,
+            'border' => Field::BORDER_RIGHT | Field::BORDER_TOP | Field::BORDER_BOTTOM
+		)));
+		$this->addField(new Field('fichaCodigoBeneficiario', array(
+			'label' => 'Agência/Código do Beneficiário',
+			'x' => 430,
+			'y' => 584,
+			'width' => 140,
 			'height' => 20,
 			'align' => 'right'
 		)));
+        
 		$this->addField(new Field('fichaDataDocumento', array(
-			'label' => 'Data do documento',
+			'label' => 'Data do Documento',
 			'dataProperty' => 'dataDocumento',
-			'x' => 40,
-			'y' => 380,
+			'x' => 30,
+			'y' => 604,
 			'width' => 90,
 			'height' => 20,
 			'renderer' => $dateRenderer
 		)));
 		$this->addField(new Field('fichaNumeroDocumento', array(
-			'label' => 'Nº do documento',
+			'label' => 'Número do Documento',
 			'dataProperty' => 'numeroDocumento',
-			'x' => 130,
-			'y' => 380,
-			'width' => 90,
+			'x' => 120,
+			'y' => 604,
+			'width' => 120,
 			'height' => 20
 		)));
 		$this->addField(new Field('fichaEspecieDocumento', array(
-			'label' => 'Espécie doc.',
+			'label' => 'Espécie Documento',
 			'dataProperty' => 'especieDocumento',
-			'x' => 220,
-			'y' => 380,
-			'width' => 55,
+			'x' => 240,
+			'y' => 604,
+			'width' => 70,
 			'height' => 20
 		)));
 		$this->addField(new Field('fichaAceite', array(
 			'label' => 'Aceite',
 			'dataProperty' => 'aceite',
-			'x' => 275,
-			'y' => 380,
-			'width' => 55,
+			'x' => 310,
+			'y' => 604,
+			'width' => 30,
 			'height' => 20
 		)));
 		$this->addField(new Field('fichaDataProcessamento', array(
-			'label' => 'Data processamento',
+			'label' => 'Data Processamento',
 			'dataProperty' => 'dataProcessamento',
-			'x' => 330,
-			'y' => 380,
+			'x' => 340,
+			'y' => 604,
 			'width' => 90,
 			'height' => 20,
 			'renderer' => $dateRenderer
 		)));
 		$this->addField(new Field('fichaNossoNumero', array(
-			'label' => 'Nosso número',
+			'label' => 'Nosso Número',
 			'dataProperty' => 'nossoNumero',
-			'x' => 420,
-			'y' => 380,
-			'width' => 150,
+			'x' => 430,
+			'y' => 604,
+			'width' => 140,
 			'height' => 20,
 			'align' => 'right'
 		)));
 		
+        $this->addField(new Field('fichaUsoBanco', array(
+			'label' => 'Uso do Banco',
+			'x' => 30,
+			'y' => 624,
+			'width' => 90,
+			'height' => 20
+		)));
 		$this->addField(new Field('fichaCarteira', array(
 			'label' => 'Carteira',
 			'dataProperty' => 'carteira',
-			'x' => 40,
-			'y' => 400,
-			'width' => 180,
+			'x' => 120,
+			'y' => 624,
+			'width' => 90,
 			'height' => 20
 		)));
 		$this->addField(new Field('fichaEspecieMoeda', array(
-			'label' => 'Espécie Moeda',
+			'label' => 'Espécie',
 			'dataProperty' => 'especieMoeda',
-			'x' => 220,
-			'y' => 400,
-			'width' => 55,
+			'x' => 210,
+			'y' => 624,
+			'width' => 30,
 			'height' => 20
 		)));
 		$this->addField(new Field('fichaQuantidade', array(
 			'label' => 'Quantidade',
 			'dataProperty' => 'quantidade',
-			'x' => 275,
-			'y' => 400,
-			'width' => 55,
+			'x' => 240,
+			'y' => 624,
+			'width' => 100,
 			'height' => 20
 		)));
-		$this->addField(new Field('fichaValorDocumento2', array(
-			'label' => '(x) Valor',
-			'x' => 330,
-			'y' => 400,
+		$this->addField(new Field('fichaValorUnitario', array(
+			'label' => 'Valor',
+			'x' => 340,
+			'y' => 624,
 			'width' => 90,
 			'height' => 20
 		)));
 		$this->addField(new Field('fichaValorDocumento', array(
 			'label' => '(=) Valor documento',
 			'dataProperty' => 'valorDocumento',
-			'x' => 420,
-			'y' => 400,
-			'width' => 150,
+			'x' => 430,
+			'y' => 624,
+			'width' => 140,
 			'height' => 20,
 			'align' => 'right',
 			'renderer' => $currencyRenderer
 		)));
 		
 		$this->addField(new Field('fichaInstrucao', array(
-			'label' => 'Instruções (Texto de responsabilidade do cedente)',
+			'label' => 'Instruções (Texto de responsabilidade do BENEFICIÁRIO)',
 			'dataProperty' => 'instrucao',
 			'multiline' => true,
-			'x' => 40,
-			'y' => 420,
-			'width' => 380,
+			'x' => 30,
+			'y' => 644,
+			'width' => 400,
 			'height' => 100
 		)));
 		
 		$this->addField(new Field('fichaValorAbatimento', array(
 			'label' => '(-) Descontos/Abatimentos',
-			'x' => 420,
-			'y' => 420,
-			'width' => 150,
+			'x' => 430,
+			'y' => 644,
+			'width' => 140,
 			'height' => 20,
 			'align' => 'right'
 		)));
 		$this->addField(new Field('fichaValorDeducao', array(
-			'label' => '(-) Outras deduções',
-			'x' => 420,
-			'y' => 440,
-			'width' => 150,
+			'x' => 430,
+			'y' => 664,
+			'width' => 140,
 			'height' => 20,
 			'align' => 'right'
 		)));
 		$this->addField(new Field('fichaValorMulta', array(
 			'label' => '(+) Mora/Multa',
-			'x' => 420,
-			'y' => 460,
-			'width' => 150,
+			'x' => 430,
+			'y' => 684,
+			'width' => 140,
 			'height' => 20,
 			'align' => 'right'
 		)));
 		$this->addField(new Field('fichaAcrescimos', array(
-			'label' => '(+) Outros acréscimos',
-			'x' => 420,
-			'y' => 480,
-			'width' => 150,
+			'x' => 430,
+			'y' => 704,
+			'width' => 140,
 			'height' => 20,
 			'align' => 'right'
 		)));
 		$this->addField(new Field('fichaValorCobrado', array(
 			'label' => '(=) Valor cobrado',
-			'x' => 420,
-			'y' => 500,
-			'width' => 150,
+			'x' => 430,
+			'y' => 724,
+			'width' => 140,
 			'height' => 20,
 			'align' => 'right'
 		)));
 		
-		$this->addField(new Field('fichaSacado', array(
-			'label' => 'Sacado',
-			'dataProperty' => 'nomeSacado',
-			'multiline' => true,
-			'x' => 40,
-			'y' => 520,
-			'width' => 530,
-			'height' => 60
+		$this->addField(new Field('fichaNomePagador', array(
+			'label' => 'Pagador:',
+            'labelWidth' => 40,
+            'labelPosition' => 'left',
+			'dataProperty' => 'nomePagador',
+			'x' => 30,
+			'y' => 744,
+			'width' => 280,
+			'height' => 12,
+            'border' => Field::BORDER_LEFT,
 		)));
+        $this->addField(new Field('fichaCnpjCpfPagador', array(
+			'label' => 'CNPJ/CPF:',
+            'labelWidth' => 40,
+            'labelPosition' => 'left',
+			'dataProperty' => 'cpfCnpjPagador',
+			'x' => 310,
+			'y' => 744,
+			'width' => 260,
+			'height' => 12,
+            'border' => Field::BORDER_RIGHT,
+		)));
+        $this->addField(new Field('fichaEnderecoPagador', array(
+			'label' => 'Endereço:',
+            'labelWidth' => 40,
+            'labelPosition' => 'left',
+			'dataProperty' => 'enderecoPagador',
+			'x' => 30,
+			'y' => 756,
+			'width' => 540,
+			'height' => 12,
+            'border' => Field::BORDER_LEFT | Field::BORDER_RIGHT,
+		)));
+        
 		$this->addField(new Field('fichaSacadorAvalista', array(
-			'label' => 'Sacador/Avalista',
-			'dataProperty' => 'sacadorAvalista',
-			'multiline' => true,
-			'x' => 40,
-			'y' => 560,
-			'width' => 530,
-			'height' => 20,
-			'border' => false
+			'label' => 'Sacador Avalista:',
+            'labelPosition' => 'left',
+			'dataProperty' => 'nomeSacadorAvalista',
+			'x' => 30,
+			'y' => 768,
+			'width' => 280,
+			'height' => 12,
+			'border' => Field::BORDER_LEFT | Field::BORDER_BOTTOM
 		)));
+        $this->addField(new Field('fichaCnpjSacadorAvalista', array(
+			'label' => 'CNPJ:',
+            'labelPosition' => 'left',
+			'dataProperty' => 'cnpjSacadorAvalista',
+			'x' => 310,
+			'y' => 768,
+			'width' => 150,
+			'height' => 12,
+			'border' => Field::BORDER_BOTTOM
+		)));
+        $this->addField(new Field('fichaCodigoBaixa', array(
+			'label' => 'Código de baixa:',
+            'labelPosition' => 'left',
+			'x' => 440,
+			'y' => 768,
+			'width' => 130,
+			'height' => 12,
+			'border' => Field::BORDER_RIGHT | Field::BORDER_BOTTOM
+		)));
+        
+        // 458
 		$this->addField(new BarcodeField('fichaCodigoBarra', array(
-			'x' => 40,
-			'y' => 583
+			'x' => 30,
+			'y' => 782
 		)));
 	}
+    
+    
+    private function initReciboEntrega()
+    {
+        $dateRenderer = function($date, $layout) {
+			if ($date instanceof \DateTime) {
+				return $date->format('d/m/Y');
+			}
+			return $date;
+		};
+		$currencyRenderer = function($value, $layout) {
+			return number_format($value, 2, ',', '.');
+		};
+        
+		// Recibo de Entrega
+		$this->addField(new LogoBancoField('reciboEntregaLogoBanco', array(
+			'x' => 30,
+			'y' => 20,
+			'height' => 30,
+			'width' => 30
+		)));
+        $this->addField(new NomeBancoField('reciboEntregaNomeBanco', array(
+			'x' => 60,
+			'y' => 30,
+			'height' => 30,
+			'width' => 80
+		)));
+		$this->addField(new CodigoBancoField('reciboEntregaCodigoBanco', array(
+			'x' => 150,
+			'y' => 30,
+			'height' => 20,
+			'width' => 50
+		)));
+
+		$this->addField(new Field('reciboEntregaBeneficiario', array(
+			'label' => 'Beneficiário',
+			'dataProperty' => 'beneficiario',
+			'x' => 30,
+			'y' => 60,
+			'width' => 200,
+			'height' => 20,
+            'border' => Field::BORDER_LEFT | Field::BORDER_TOP | Field::BORDER_BOTTOM
+		)));
+		$this->addField(new Field('reciboEntregaCpfCnpj', array(
+			'label' => 'CNPJ/CPF',
+			'dataProperty' => 'cpfCnpjBeneficiario',
+			'x' => 230,
+			'y' => 60,
+			'width' => 90,
+			'height' => 20,
+            'border' => Field::BORDER_RIGHT | Field::BORDER_TOP | Field::BORDER_BOTTOM
+		)));
+        $this->addField(new Field('reciboEntregaNomeSacadorAvalista', array(
+			'label' => 'Sacador Avalista',
+			'dataProperty' => 'nomeSacadorAvalista',
+			'x' => 320,
+			'y' => 60,
+			'width' => 150,
+			'height' => 20
+		)));
+		$this->addField(new Field('reciboEntregaDataVencimento', array(
+			'label' => 'Vencimento',
+			'dataProperty' => 'dataVencimento',
+			'x' => 470,
+			'y' => 60,
+			'width' => 100,
+			'height' => 20,
+			'renderer' => $dateRenderer,
+            'align' => 'center'
+		)));
+        
+        $this->addField(new Field('reciboEntregaEnderecoBeneficiario', array(
+			'label' => 'Endereço Beneficiário/Sacador Avalista',
+			'dataProperty' => 'enderecoBeneficiario',
+			'x' => 30,
+			'y' => 80,
+			'width' => 540,
+			'height' => 20
+		)));
+        
+		$this->addField(new Field('reciboEntregaNossoNumero', array(
+			'label' => 'Nosso Número',
+			'dataProperty' => 'nossoNumero',
+			'x' => 30,
+			'y' => 100,
+			'width' => 90,
+			'height' => 20
+		)));
+        $this->addField(new Field('reciboEntregaCarteira', array(
+			'label' => 'Carteira',
+			'dataProperty' => 'carteira',
+			'x' => 120,
+			'y' => 100,
+			'width' => 90,
+			'height' => 20
+		)));
+        $this->addField(new Field('reciboEntregaEspecieDocumento', array(
+			'label' => 'Espécie Documento',
+			'dataProperty' => 'especieDocumento',
+			'x' => 210,
+			'y' => 100,
+			'width' => 80,
+			'height' => 20
+		)));
+		$this->addField(new Field('reciboEntregaQuantidade', array(
+			'label' => 'Quantidade',
+			'dataProperty' => 'quantidade',
+			'x' => 290,
+			'y' => 100,
+			'width' => 85,
+			'height' => 20
+		)));
+		$this->addField(new Field('reciboEntregaValorUnitario', array(
+			'label' => 'Valor',
+			'dataProperty' => 'valorUnitario',
+			'x' => 375,
+			'y' => 100,
+			'width' => 85,
+			'height' => 20
+		)));
+        $this->addField(new Field('reciboEntregaCodigoBeneficiario', array(
+			'label' => 'Agência/Código do Beneficiário',
+			'x' => 460,
+			'y' => 100,
+			'width' => 110,
+			'height' => 20,
+            'align' => 'right'
+		)));
+        
+        $this->addField(new Field('reciboEntregaDataDocumento', array(
+			'label' => 'Data do Documento',
+			'dataProperty' => 'dataDocumento',
+			'x' => 30,
+			'y' => 120,
+			'width' => 90,
+			'height' => 20,
+			'renderer' => $dateRenderer
+		)));
+		$this->addField(new Field('reciboEntregaNumeroDocumento', array(
+			'label' => 'Número do Documento',
+			'dataProperty' => 'numeroDocumento',
+			'x' => 120,
+			'y' => 120,
+			'width' => 90,
+			'height' => 20
+		)));
+        $this->addField(new Field('reciboEntregaEspecieMoeda', array(
+			'label' => 'Espécie',
+			'dataProperty' => 'especieMoeda',
+			'x' => 210,
+			'y' => 120,
+			'width' => 90,
+			'height' => 20
+		)));
+        $this->addField(new Field('reciboEntregaAceite', array(
+			'label' => 'Aceite',
+			'dataProperty' => 'aceite',
+			'x' => 300,
+			'y' => 120,
+			'width' => 50,
+			'height' => 20
+		)));
+        $this->addField(new Field('reciboEntregaDataProcessamento', array(
+			'label' => 'Data de Processamento',
+			'dataProperty' => 'dataProcessamento',
+			'x' => 350,
+			'y' => 120,
+			'width' => 90,
+			'height' => 20,
+			'renderer' => $dateRenderer
+		)));
+		$this->addField(new Field('reciboEntregaValorDocumento', array(
+			'label' => 'Valor do Documento',
+			'dataProperty' => 'valorDocumento',
+			'x' => 440,
+			'y' => 120,
+			'width' => 130,
+			'height' => 20,
+			'align' => 'right',
+			'renderer' => $currencyRenderer
+		)));
+        
+        $this->addField(new Field('reciboEntregaNomeRecebedor', array(
+			'label' => 'Nome do Recebedor',
+			'x' => 30,
+			'y' => 140,
+			'width' => 440,
+			'height' => 20
+		)));
+        $this->addField(new Field('reciboEntregaDataEntrega', array(
+			'label' => 'Data da Entrega',
+			'x' => 470,
+			'y' => 140,
+			'width' => 100,
+			'height' => 20
+		)));
+        $this->addField(new Field('reciboEntregaAssinatura', array(
+			'label' => 'Assinatura do Recebedor',
+			'x' => 30,
+			'y' => 165,
+			'width' => 540,
+			'height' => 40
+		)));
+        
+        $fontBold = Font::fontWithName(Font::FONT_HELVETICA_BOLD);
+        $this->setFont($fontBold, 10)
+			->drawText('Recibo de Entrega', 480, self::translateYPosition(
+                $this->getField('reciboEntregaDataVencimento')->getY()-15
+            ));
+    }
 
 	/**
 	 * 
@@ -604,8 +922,8 @@ abstract class AbstractBoleto extends Page
 		while ($y <= 842) {
 			$this->setFont($font, 8)
 				->drawLine(0, self::translateYPosition($y), 595, self::translateYPosition($y))
-				->drawText($y, 1, self::translateYPosition($y)+1);
-			$y += 20;
+				->drawText($y, 15, self::translateYPosition($y)+1);
+			$y += 10;
 		}
 	}
     

@@ -57,7 +57,7 @@ class Santander extends BaseLayout {
 	public function getLinhaDigitavel() {
 		$codigoBanco     = $this->get('codigoBanco');
 		$codigoMoeda     = $this->get('codigoMoeda');
-		$codigoCedente   = str_pad($this->get('codigoCedente'), 7, '0', STR_PAD_LEFT);
+		$codigoBeneficiario   = str_pad($this->get('codigoBeneficiario'), 7, '0', STR_PAD_LEFT);
 		$nossoNumero     = str_pad($this->get('nossoNumero'), 13, '0', STR_PAD_LEFT);
 		$ios             = $this->get('ios');
 		$carteira        = $this->get('carteira');
@@ -66,11 +66,11 @@ class Santander extends BaseLayout {
 		
 		$codigoBarra     = $this->getCodigoBarra();
 		
-		$c1 = sprintf('%s%s%s%s', $codigoBanco, $codigoMoeda, 9, substr($codigoCedente, 0, 4));
+		$c1 = sprintf('%s%s%s%s', $codigoBanco, $codigoMoeda, 9, substr($codigoBeneficiario, 0, 4));
 		$c1 = sprintf('%s%s', $c1, self::modulo10($c1));
   		$c1 = sprintf('%s.%s', substr($c1, 0, 5), substr($c1, 5));
   		
-  		$c2 = sprintf('%s%s', substr($codigoCedente, -3), substr($nossoNumero, 0, 7));
+  		$c2 = sprintf('%s%s', substr($codigoBeneficiario, -3), substr($nossoNumero, 0, 7));
 		$c2 = sprintf('%s%s', $c2, self::modulo10($c2));
   		$c2 = sprintf('%s.%s', substr($c2, 0, 5), substr($c2, 5));
   		
@@ -98,13 +98,13 @@ class Santander extends BaseLayout {
 		$numeroMoeda     = $this->get('codigoMoeda');
 		$fatorVencimento = $this->getFatorVencimento($this->get('dataVencimento'));
 		$valor           = str_pad(number_format($this->get('valorDocumento'), 2, '', ''), 10, '0', STR_PAD_LEFT);
-		$codigoCedente   = str_pad($this->get('codigoCedente'), 7, '0', STR_PAD_LEFT);
+		$codigoBeneficiario   = str_pad($this->get('codigoBeneficiario'), 7, '0', STR_PAD_LEFT);
 		$nossoNumero     = str_pad($this->get('nossoNumero'), 13, '0', STR_PAD_LEFT);
         //$nossoNumero = $this->get('nossoNumero');
 		$ios             = $this->get('ios');
 		$carteira        = $this->get('carteira');
 		
-		$_barra = sprintf('%s%s%s%s%s%s%s%s%s', $codigoBanco, $numeroMoeda, $fatorVencimento, $valor, 9, $codigoCedente, $nossoNumero, $ios, $carteira);
+		$_barra = sprintf('%s%s%s%s%s%s%s%s%s', $codigoBanco, $numeroMoeda, $fatorVencimento, $valor, 9, $codigoBeneficiario, $nossoNumero, $ios, $carteira);
 		$_barraDv = self::getDigitoVerificadorBarra($_barra);
 		
 		$barra = sprintf('%s%d%s', substr($_barra, 0, 4), $_barraDv, substr($_barra, 4));

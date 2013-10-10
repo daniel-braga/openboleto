@@ -23,7 +23,7 @@ class Barcode extends Field
 				'mandatoryQuietZones' => false
 			), array(
 				'imageType' => 'jpeg',
-				'height' => 52,
+				'height' => 50,
 				'width' => 405
 			)
 		);
@@ -32,7 +32,7 @@ class Barcode extends Field
 		if (false === imagejpeg($imageResource, $tempFileName)) {
 			throw new \Exception(sprintf("Não foi possível criar o arquivo %s", $tempFileName));
 		}
-		
+        
 		$pdfImageResource = Image::imageWithPath($tempFileName);
 		$barcodeImageHeight = ($pdfImageResource->getPixelHeight()/96) * 72; // pixels to points at 96dpi
 		$barcodeImageWidth = ($pdfImageResource->getPixelWidth()/96) * 72; // pixels to points at 96dpi
