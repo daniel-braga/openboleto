@@ -33,7 +33,48 @@ $layoutParams = array(
     'cnpjSacadorAvalista' => ''
 );
 
-$boleto = BoletoFactory::createFactory('itau', $layoutParams, true);
-$content = $boleto->output();
+$xml = "<boleto>\n";
+foreach($layoutParams as $param => $value) {
+    $type = 'string';
+    if ($value instanceof \DateTime) {
+        $type = 'date';
+        $value = $value->format('Y-m-d');
+    }
+    elseif (is_float($value)) {
+        $type = 'float';
+    }
+    
+    $xml .= sprintf("\t<%1\$s type=\"%2\$s\">%3\$s</%1\$s>\n", $param, $type, $value);
+}
+$xml .= "</boleto>\n";
 
-file_put_contents('/Users/daniel/output.pdf', $content);
+$doc = new \SimpleXMLElement($xml);
+//echo $doc->saveXML();
+
+$params = array();
+foreach ($doc->children() as $node) {
+    $paramName = $node->getName();
+    $paramValue = "$node";
+    
+    foreach($node->attributes() as $attrName => $attrValue) {
+        if ($attrName == 'type') {
+            if ($attrValue == 'date') {
+                $paramValue = \DateTime::createFromFormat('Y-m-d', $paramValue);
+            }
+            elseif ($attrValue == 'float') {
+                $paramValue = (float) $paramValue;
+            }
+        }
+    }
+    
+    $params[$paramName] = $paramValue;
+}
+
+
+print_r($params);
+//$boleto = BoletoFactory::createFactory('itau', $layoutParams, true);
+//$content = $boleto->output();
+
+
+
+//file_put_contents('/Users/daniel/output.pdf', $content);
