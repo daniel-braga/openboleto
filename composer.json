@@ -1,19 +1,25 @@
 {
     "name": "danielbraga/openboleto",
     "description": "API para geração de boletos bancários",
-    "license": "BSD-3-Clause",
+    "license": "GPLv3",
     "keywords": [
         "boleto",
         "febraban",
         "pdf"
     ],
+    "homepage": "https://github.com/danielbragaalmeida/openboleto",
     "minimum-stability": "dev",
     "authors": [
-        {"name": "Daniel Braga", "email": "daniel@danielbraga.com"}
+        {
+            "name": "Daniel Braga", 
+            "email": "daniel@danielbraga.com",
+            "homepage": "http://danielbraga.com",
+            "role": "Developer"
+        }
     ],
     "autoload": {
         "psr-0": { 
-            "OpenBoleto\\": "lib/" 
+            "OpenBoleto": "lib/" 
         }
     },
     "require": {
