@@ -7,11 +7,11 @@ $dataVencimento = DateTime::createFromFormat('d/m/Y', '23/10/2013');
 
 $layoutParams = array(
 	'especieDocumento' => 'DM',
-	'nossoNumero' => '52758965',
+	'nossoNumero' => '3',
     'agencia' => '8044',
     'conta' => '01623',
     'dacConta' => '9',
-	'carteira' => '157',
+	'carteira' => '109',
 	'numeroDocumento' => '43075',
     'valorDocumento' => 16855.92,
 	'dataVencimento' => $dataVencimento,
@@ -31,8 +31,9 @@ $layoutParams = array(
 	'beneficiario' => 'COMERCIAL OSVALDO TARORA LTDA',
     'nomeSacadorAvalista' => '',
     'cnpjSacadorAvalista' => ''
-	
 );
 
 $boleto = BoletoFactory::createFactory('itau', $layoutParams, true);
-$boleto->output();
+$content = $boleto->output();
+
+file_put_contents('/Users/daniel/output.pdf', $content);
