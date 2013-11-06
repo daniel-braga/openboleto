@@ -935,6 +935,6 @@ abstract class AbstractBoleto extends Page
         $pdf = new PdfDocument();
 		$pdf->pages[] = $this;
         
-        $pdf->save('/Users/daniel/output.pdf');
+        return $pdf->render();
     }
 }
