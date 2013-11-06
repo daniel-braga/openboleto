@@ -12,7 +12,9 @@
         {"name": "Daniel Braga", "email": "daniel@danielbraga.com"}
     ],
     "autoload": {
-        "psr-0": { "OpenBoleto\\": "lib/" }
+        "psr-0": { 
+            "OpenBoleto\\": "lib/" 
+        }
     },
     "require": {
         "php": ">=5.4",
