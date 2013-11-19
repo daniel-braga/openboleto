@@ -59,31 +59,3 @@ $client = new SoapClient(null, array(
 $result = $client->gerar('itau', $xml);
 
 file_put_contents('boleto.pdf', base64_decode($result));
-
-/*
-$doc = new \SimpleXMLElement($xml);
-
-$params = array();
-foreach ($doc->children() as $node) {
-    $paramName = $node->getName();
-    $paramValue = "$node";
-    
-    foreach($node->attributes() as $attrName => $attrValue) {
-        if ($attrName == 'type') {
-            if ($attrValue == 'date') {
-                $paramValue = \DateTime::createFromFormat('Y-m-d', $paramValue);
-            }
-            elseif ($attrValue == 'float') {
-                $paramValue = (float) $paramValue;
-            }
-        }
-    }
-    
-    $params[$paramName] = $paramValue;
-}
-
-$boleto = BoletoFactory::createFactory('itau', $layoutParams, true);
-$content = $boleto->output();
-
-file_put_contents('/Users/daniel/output.pdf', $content);
- * */
