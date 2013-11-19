@@ -48,8 +48,20 @@ foreach($layoutParams as $param => $value) {
 }
 $xml .= "</boleto>\n";
 
+$client = new SoapClient(null, array(
+    'location'   => 'https://site.local/webservices/Boleto.php',
+    'uri'        => 'https://site.local/webservices/Boleto.php',
+    'local_cert' => '/Users/daniel/cert.pem',
+    'trace'      => true,
+    'passphrase' => '06286dba'
+));
+
+$result = $client->gerar('itau', $xml);
+
+file_put_contents('boleto.pdf', base64_decode($result));
+
+/*
 $doc = new \SimpleXMLElement($xml);
-//echo $doc->saveXML();
 
 $params = array();
 foreach ($doc->children() as $node) {
@@ -70,11 +82,8 @@ foreach ($doc->children() as $node) {
     $params[$paramName] = $paramValue;
 }
 
+$boleto = BoletoFactory::createFactory('itau', $layoutParams, true);
+$content = $boleto->output();
 
-print_r($params);
-//$boleto = BoletoFactory::createFactory('itau', $layoutParams, true);
-//$content = $boleto->output();
-
-
-
-//file_put_contents('/Users/daniel/output.pdf', $content);
+file_put_contents('/Users/daniel/output.pdf', $content);
+ * */
