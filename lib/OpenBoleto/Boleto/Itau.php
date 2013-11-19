@@ -49,11 +49,11 @@ class Itau extends AbstractBoleto {
 			->setValue($logoFile);
         
         $this->getField('reciboNomeBanco')
-            ->setValue('Banco Itau S.A.');
+            ->setValue('Banco Itaú S.A.');
         $this->getField('reciboEntregaNomeBanco')
-            ->setValue('Banco Itau S.A.');
+            ->setValue('Banco Itaú S.A.');
         $this->getField('fichaNomeBanco')
-            ->setValue('Banco Itau S.A.');
+            ->setValue('Banco Itaú S.A.');
         
         $this->getField('fichaLocalPagamento')
             ->setMultiline(true);
