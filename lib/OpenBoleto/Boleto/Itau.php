@@ -26,7 +26,7 @@ class Itau extends AbstractBoleto {
             $carteira    = $layout->get('carteira');
             $nossoNumero = str_pad($layout->get('nossoNumero'), 8, '0', STR_PAD_LEFT);
             $agencia     = str_pad($layout->get('agencia'), 4, '0', STR_PAD_LEFT);
-            $conta       = str_pad($layout->get('conta'), 4, '0', STR_PAD_LEFT);
+            $conta       = str_pad($layout->get('conta'), 5, '0', STR_PAD_LEFT);
             
             if (in_array($carteira, array(126, 131, 146, 150, 168))) {
                 $dacAgenciaContaCarteiraNossoNumero = LayoutItau::modulo10($carteira.$nossoNumero);
