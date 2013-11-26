@@ -81,7 +81,7 @@ class Itau extends BaseLayout {
 		$fatorVencimento    = $this->getFatorVencimento($this->get('dataVencimento'));
 		$valor              = str_pad(number_format($this->get('valorDocumento'), 2, '', ''), 10, '0', STR_PAD_LEFT);
         $agencia            = str_pad($this->get('agencia'), 4, '0', STR_PAD_LEFT);
-        $conta              = str_pad($this->get('conta'), 4, '0', STR_PAD_LEFT);
+        $conta              = str_pad($this->get('conta'), 5, '0', STR_PAD_LEFT);
 		
         if (in_array($carteira, array(126, 131, 146, 150, 168))) {
             $dacAgenciaContaCarteiraNossoNumero = self::modulo10($carteira.$nossoNumero);
