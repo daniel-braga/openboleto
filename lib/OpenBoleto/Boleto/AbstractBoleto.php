@@ -218,25 +218,25 @@ abstract class AbstractBoleto extends Page
 		// Recibo
 		$this->addField(new LogoBancoField('reciboLogoBanco', array(
 			'x' => 30,
-			'y' => 359,
+			'y' => 339,
 			'height' => 30,
 			'width' => 30
 		)));
         $this->addField(new NomeBancoField('reciboNomeBanco', array(
 			'x' => 60,
-			'y' => 369,
+			'y' => 349,
 			'height' => 30,
 			'width' => 80
 		)));
 		$this->addField(new CodigoBancoField('reciboCodigoBanco', array(
 			'x' => 150,
-			'y' => 369,
+			'y' => 349,
 			'height' => 20,
 			'width' => 50
 		)));
 		$this->addField(new LinhaDigitavelField('reciboLinhaDigitavel', array(
 			'x' => 200,
-			'y' => 369,
+			'y' => 349,
 			'height' => 20,
 			'width' => 370
 		)));
@@ -244,7 +244,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Beneficiário',
 			'dataProperty' => 'beneficiario',
 			'x' => 30,
-			'y' => 394,
+			'y' => 374,
 			'width' => 200,
 			'height' => 20,
             'border' => Field::BORDER_LEFT | Field::BORDER_TOP | Field::BORDER_BOTTOM
@@ -253,7 +253,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'CNPJ/CPF',
 			'dataProperty' => 'cpfCnpjBeneficiario',
 			'x' => 230,
-			'y' => 394,
+			'y' => 374,
 			'width' => 90,
 			'height' => 20,
             'border' => Field::BORDER_RIGHT | Field::BORDER_TOP | Field::BORDER_BOTTOM
@@ -262,7 +262,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Sacador Avalista',
 			'dataProperty' => 'nomeSacadorAvalista',
 			'x' => 320,
-			'y' => 394,
+			'y' => 374,
 			'width' => 150,
 			'height' => 20
 		)));
@@ -270,7 +270,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Vencimento',
 			'dataProperty' => 'dataVencimento',
 			'x' => 470,
-			'y' => 394,
+			'y' => 374,
 			'width' => 100,
 			'height' => 20,
 			'renderer' => $dateRenderer,
@@ -281,7 +281,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Endereço Beneficiário/Sacador Avalista',
 			'dataProperty' => 'enderecoBeneficiario',
 			'x' => 30,
-			'y' => 414,
+			'y' => 394,
 			'width' => 540,
 			'height' => 20
 		)));
@@ -290,7 +290,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Nosso Número',
 			'dataProperty' => 'nossoNumero',
 			'x' => 30,
-			'y' => 434,
+			'y' => 414,
 			'width' => 90,
 			'height' => 20
 		)));
@@ -298,7 +298,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Carteira',
 			'dataProperty' => 'carteira',
 			'x' => 120,
-			'y' => 434,
+			'y' => 414,
 			'width' => 90,
 			'height' => 20
 		)));
@@ -306,7 +306,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Espécie Documento',
 			'dataProperty' => 'especieDocumento',
 			'x' => 210,
-			'y' => 434,
+			'y' => 414,
 			'width' => 80,
 			'height' => 20
 		)));
@@ -314,7 +314,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Quantidade',
 			'dataProperty' => 'quantidade',
 			'x' => 290,
-			'y' => 434,
+			'y' => 414,
 			'width' => 85,
 			'height' => 20
 		)));
@@ -322,14 +322,14 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Valor',
 			'dataProperty' => 'valorUnitario',
 			'x' => 375,
-			'y' => 434,
+			'y' => 414,
 			'width' => 85,
 			'height' => 20
 		)));
         $this->addField(new Field('reciboCodigoBeneficiario', array(
 			'label' => 'Agência/Código do Beneficiário',
 			'x' => 460,
-			'y' => 434,
+			'y' => 414,
 			'width' => 110,
 			'height' => 20,
             'align' => 'right'
@@ -339,7 +339,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Data do Documento',
 			'dataProperty' => 'dataDocumento',
 			'x' => 30,
-			'y' => 454,
+			'y' => 434,
 			'width' => 90,
 			'height' => 20,
 			'renderer' => $dateRenderer
@@ -348,7 +348,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Número do Documento',
 			'dataProperty' => 'numeroDocumento',
 			'x' => 120,
-			'y' => 454,
+			'y' => 434,
 			'width' => 90,
 			'height' => 20
 		)));
@@ -356,7 +356,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Espécie',
 			'dataProperty' => 'especieMoeda',
 			'x' => 210,
-			'y' => 454,
+			'y' => 434,
 			'width' => 90,
 			'height' => 20
 		)));
@@ -364,7 +364,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Aceite',
 			'dataProperty' => 'aceite',
 			'x' => 300,
-			'y' => 454,
+			'y' => 434,
 			'width' => 50,
 			'height' => 20
 		)));
@@ -372,7 +372,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Data de Processamento',
 			'dataProperty' => 'dataProcessamento',
 			'x' => 350,
-			'y' => 454,
+			'y' => 434,
 			'width' => 90,
 			'height' => 20,
 			'renderer' => $dateRenderer
@@ -381,12 +381,22 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Valor do Documento',
 			'dataProperty' => 'valorDocumento',
 			'x' => 440,
-			'y' => 454,
+			'y' => 434,
 			'width' => 130,
 			'height' => 20,
 			'align' => 'right',
 			'renderer' => $currencyRenderer
 		)));
+        
+         $this->addField(new Field('reciboDemonstrativo', array(
+			'label' => 'Demonstrativo',
+			'dataProperty' => 'demonstrativo',
+			'x' => 30,
+			'y' => 459,
+			'width' => 540,
+			'height' => 20
+		)));
+        
         $this->addField(new Field('reciboAutenticacaoMecanica', array(
 			'label' => 'Autenticação Mecânica',
 			'x' => 370,
@@ -705,19 +715,19 @@ abstract class AbstractBoleto extends Page
 		// Recibo de Entrega
 		$this->addField(new LogoBancoField('reciboEntregaLogoBanco', array(
 			'x' => 30,
-			'y' => 20,
+			'y' => 25,
 			'height' => 30,
 			'width' => 30
 		)));
         $this->addField(new NomeBancoField('reciboEntregaNomeBanco', array(
 			'x' => 60,
-			'y' => 30,
+			'y' => 35,
 			'height' => 30,
 			'width' => 80
 		)));
 		$this->addField(new CodigoBancoField('reciboEntregaCodigoBanco', array(
 			'x' => 150,
-			'y' => 30,
+			'y' => 35,
 			'height' => 20,
 			'width' => 50
 		)));
@@ -895,7 +905,7 @@ abstract class AbstractBoleto extends Page
         $fontBold = Font::fontWithName(Font::FONT_HELVETICA_BOLD);
         $this->setFont($fontBold, 10)
 			->drawText('Recibo de Entrega', 480, self::translateYPosition(
-                $this->getField('reciboEntregaDataVencimento')->getY()-15
+                $this->getField('reciboEntregaDataVencimento')->getY()-10
             ));
     }
 
