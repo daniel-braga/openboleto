@@ -1,0 +1,1 @@
+Este diretório é usado para gerar as imagens temporárias de códigos de barras
