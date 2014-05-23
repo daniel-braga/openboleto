@@ -3,3 +3,4 @@
 /composer.lock
 /tmp/*.jpg
 /tmp/*.pdf
+/composer.phar
