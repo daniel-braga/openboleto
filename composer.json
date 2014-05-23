@@ -24,9 +24,9 @@
     },
     "require": {
         "php": ">=5.4",
-        "zendframework/zendpdf": "dev-master",
-        "zendframework/zend-barcode": "dev-master",
-        "zendframework/zend-servicemanager": "dev-master",
-        "zendframework/zend-validator": "dev-master"
+        "zendframework/zendpdf": "@dev",
+        "zendframework/zend-barcode": "@dev",
+        "zendframework/zend-servicemanager": "@dev",
+        "zendframework/zend-validator": "@dev"
     }
 }
