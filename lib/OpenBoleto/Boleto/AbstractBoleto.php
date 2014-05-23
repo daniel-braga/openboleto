@@ -392,7 +392,7 @@ abstract class AbstractBoleto extends Page
 			'label' => 'Demonstrativo',
 			'dataProperty' => 'demonstrativo',
 			'x' => 30,
-			'y' => 459,
+			'y' => 454,
 			'width' => 540,
 			'height' => 20
 		)));
