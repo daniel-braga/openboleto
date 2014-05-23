@@ -1,5 +1,5 @@
 /vendor/
 /nbproject/
 /composer.lock
-/tests/boleto.pdf
 /tmp/*.jpg
+/tmp/*.pdf
