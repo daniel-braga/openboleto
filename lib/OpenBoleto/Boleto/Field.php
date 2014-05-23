@@ -385,7 +385,7 @@ class Field
 				if ($this->_align == 'right') {
                     $x1 = $x2 - 2 - $valueTextWidth;
 				}
-                elseif ($this->align == 'center') {
+                elseif ($this->_align == 'center') {
                     $x1 = $x1 + ($this->_width/2) - ($valueTextWidth/2);
                 }
 				
