@@ -37,4 +37,4 @@ $layoutParams = array(
 $boleto = BoletoFactory::createFactory('itau', $layoutParams, true);
 $result = $boleto->output();
 
-file_put_contents('boleto_local.pdf', $result);
+file_put_contents('../tmp/boleto_local.pdf', $result);
