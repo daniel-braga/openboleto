@@ -60,7 +60,7 @@ abstract class AbstractBoleto extends Page
 	*/ 
 	public static function getTextWidth($text, AbstractSimpleFont $font, $font_size) 
 	{
-		$drawing_text = iconv('', 'UTF-16BE', $text);
+		$drawing_text = iconv('UTF-8', 'UTF-16BE', $text);
 		$characters    = array();
 		for ($i = 0; $i < strlen($drawing_text); $i++) {
 			$characters[] = (ord($drawing_text[$i++]) << 8) | ord ($drawing_text[$i]);
