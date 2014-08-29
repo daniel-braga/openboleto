@@ -188,10 +188,11 @@ abstract class AbstractBoleto extends Page
 			->drawLine(30, $posCut2, 570, $posCut2);
 			
 		$this->setFont($fontBold, 8)
-			->drawText('Ficha de Compensação', 480, self::translateYPosition($this->getField('fichaCodigoBarra')->getY()+5))
+			->drawText('Ficha de Compensação', 480, self::translateYPosition($this->getField('fichaCodigoBarra')->getY()+5), 
+                    'UTF-8')
 			->setFont($fontNormal, 7)
 			->drawText('Autenticação Mecânica', 380, self::translateYPosition(
-                $this->getField('fichaCodigoBarra')->getY()+5)
+                $this->getField('fichaCodigoBarra')->getY()+5), 'UTF-8'
             );
         
 		foreach($this->_fields as $field) {
