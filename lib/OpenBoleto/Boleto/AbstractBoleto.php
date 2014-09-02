@@ -703,13 +703,13 @@ abstract class AbstractBoleto extends Page
     
     private function initReciboEntrega()
     {
-        $dateRenderer = function($date, $layout) {
+        $dateRenderer = function($date) {
 			if ($date instanceof \DateTime) {
 				return $date->format('d/m/Y');
 			}
 			return $date;
 		};
-		$currencyRenderer = function($value, $layout) {
+		$currencyRenderer = function($value) {
 			return number_format($value, 2, ',', '.');
 		};
         
@@ -881,24 +881,43 @@ abstract class AbstractBoleto extends Page
 			'renderer' => $currencyRenderer
 		)));
         
+        $this->addField(new Field('reciboEntregaPagador', array(
+			'label' => 'Pagador',
+			'dataProperty' => 'nomePagador',
+			'x' => 30,
+			'y' => 140,
+			'width' => 400,
+			'height' => 20,
+            'border' => Field::BORDER_LEFT | Field::BORDER_TOP | Field::BORDER_BOTTOM
+		)));
+		$this->addField(new Field('reciboEntregaCpfCnpjPagador', array(
+			'label' => 'CNPJ/CPF',
+			'dataProperty' => 'cpfCnpjPagador',
+			'x' => 430,
+			'y' => 140,
+			'width' => 140,
+			'height' => 20,
+            'border' => Field::BORDER_RIGHT | Field::BORDER_TOP | Field::BORDER_BOTTOM
+		)));
+        
         $this->addField(new Field('reciboEntregaNomeRecebedor', array(
 			'label' => 'Nome do Recebedor',
 			'x' => 30,
-			'y' => 140,
+			'y' => 160,
 			'width' => 440,
 			'height' => 20
 		)));
         $this->addField(new Field('reciboEntregaDataEntrega', array(
 			'label' => 'Data da Entrega',
 			'x' => 470,
-			'y' => 140,
+			'y' => 160,
 			'width' => 100,
 			'height' => 20
 		)));
         $this->addField(new Field('reciboEntregaAssinatura', array(
 			'label' => 'Assinatura do Recebedor',
 			'x' => 30,
-			'y' => 165,
+			'y' => 185,
 			'width' => 540,
 			'height' => 40
 		)));
