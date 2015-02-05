@@ -388,6 +388,25 @@ abstract class AbstractBoleto extends Page
 			'align' => 'right',
 			'renderer' => $currencyRenderer
 		)));
+
+		$this->addField(new Field('reciboEntregaPagador', array(
+			'label' => 'Pagador',
+			'dataProperty' => 'nomePagador',
+			'x' => 30,
+			'y' => 454,
+			'width' => 400,
+			'height' => 20,
+			'border' => Field::BORDER_LEFT | Field::BORDER_TOP | Field::BORDER_BOTTOM
+		)));
+		$this->addField(new Field('reciboEntregaCpfCnpjPagador', array(
+			'label' => 'CNPJ/CPF',
+			'dataProperty' => 'cpfCnpjPagador',
+			'x' => 430,
+			'y' => 454,
+			'width' => 140,
+			'height' => 20,
+			'border' => Field::BORDER_RIGHT | Field::BORDER_TOP | Field::BORDER_BOTTOM
+		)));
         
          $this->addField(new Field('reciboDemonstrativo', array(
 			'label' => 'Demonstrativo',
