@@ -8,7 +8,6 @@
         "pdf"
     ],
     "homepage": "https://github.com/danielbragaalmeida/openboleto",
-    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Daniel Braga", 
@@ -24,9 +23,9 @@
     },
     "require": {
         "php": ">=5.4",
-        "zendframework/zendpdf": "@dev",
-        "zendframework/zend-barcode": "@dev",
-        "zendframework/zend-servicemanager": "@dev",
-        "zendframework/zend-validator": "@dev"
+        "zendframework/zendpdf": "^2.0",
+        "zendframework/zend-barcode": "^2.3",
+        "zendframework/zend-servicemanager": "^2.3",
+        "zendframework/zend-validator": "^2.3"
     }
 }
