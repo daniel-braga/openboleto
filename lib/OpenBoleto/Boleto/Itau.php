@@ -35,9 +35,7 @@ class Itau extends AbstractBoleto {
                 $dacAgenciaContaCarteiraNossoNumero = LayoutItau::modulo10($agencia.$conta.$carteira.$nossoNumero);
             }
             
-			return sprintf('%s/%s-%d', $layout->get('carteira'), 
-                $layout->get('nossoNumero'), $dacAgenciaContaCarteiraNossoNumero
-            );
+			return sprintf('%s/%s-%d', $carteira, $nossoNumero, $dacAgenciaContaCarteiraNossoNumero);
 		};
 
 		$logoFile = BoletoFactory::getRootDir() . '/Layout/Itau/logo.png';
